@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking Details | Hotel Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Booking Details</h2>
+    <div>
+        <a href="{% url 'booking-list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Bookings
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Left Column - Booking Details -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Booking Information</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Booking ID:</strong> #{{ booking.id }}</p>
+                        <p><strong>Guest:</strong> {{ booking.user.get_full_name|default:booking.user.username }}</p>
+                        <p><strong>Room:</strong> {{ booking.room.room_number }} - {{ booking.room.room_type.name }}</p>
+                        <p><strong>Check-in:</strong> {{ booking.check_in|date:"F d, Y" }}</p>
+                        <p><strong>Check-out:</strong> {{ booking.check_out|date:"F d, Y" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Status:</strong> 
+                            {% if booking.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% elif booking.status == 'checked_in' %}
+                                <span class="badge bg-success">Checked In</span>
+                            {% elif booking.status == 'checked_out' %}
+                                <span class="badge bg-info">Checked Out</span>
+                            {% elif booking.status == 'cancelled' %}
+                                <span class="badge bg-danger">Cancelled</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Adults:</strong> {{ booking.adults }}</p>
+                        <p><strong>Children:</strong> {{ booking.children }}</p>
+                        <p><strong>Total Price:</strong> ${{ booking.total_price }}</p>
+                        <p><strong>Booking Date:</strong> {{ booking.booking_date|date:"F d, Y H:i" }}</p>
+                    </div>
+                </div>
+                
+                {% if booking.special_requests %}
+                <div class="mt-3">
+                    <h5>Special Requests</h5>
+                    <p>{{ booking.special_requests }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Services -->
+        {% if booking.bookingservice_set.all %}
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Additional Services</h4>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bs in booking.bookingservice_set.all %}
+                        <tr>
+                            <td>{{ bs.service.name }}</td>
+                            <td>{{ bs.quantity }}</td>
+                            <td>${{ bs.service.price }}</td>
+                            <td>${{ bs.total_price }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Bill Information -->
+        {% if booking.bill %}
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Billing Information</h4>
+                <div>
+                    <a href="{% url 'invoice' booking.bill.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-file-invoice me-1"></i> View Invoice
+                    </a>
+                    <a href="{% url 'download-invoice' booking.bill.id %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-download me-1"></i> Download PDF
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Room Charges:</strong> ${{ booking.bill.room_charges }}</p>
+                        <p><strong>Service Charges:</strong> ${{ booking.bill.service_charges }}</p>
+                        <p><strong>Tax ({{ booking.bill.tax_percentage }}%):</strong> ${{ booking.bill.tax_amount }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Total Amount:</strong> ${{ booking.bill.total_amount }}</p>
+                        <p><strong>Payment Status:</strong> 
+                            {% if booking.bill.payment_status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% elif booking.bill.payment_status == 'paid' %}
+                                <span class="badge bg-success">Paid</span>
+                            {% endif %}
+                        </p>
+                        {% if booking.bill.payment_status == 'paid' %}
+                        <p><strong>Paid On:</strong> {{ booking.bill.paid_at|date:"F d, Y H:i" }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Feedback if checked out -->
+        {% if booking.status == 'checked_out' and booking.user == user and not booking.feedback_set.exists %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Share Your Experience</h4>
+            </div>
+            <div class="card-body">
+                <p>We'd love to hear about your stay with us!</p>
+                <a href="{% url 'feedback-create' booking.id %}" class="btn btn-primary">
+                    <i class="fas fa-comment me-2"></i>Leave Feedback
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Right Column - Actions and Room Info -->
+    <div class="col-md-4">
+        <!-- Action Buttons -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Actions</h4>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    {% if booking.status == 'pending' and user.userrole.role == 'admin' or user.userrole.role == 'receptionist' %}
+                    <a href="{% url 'booking-check-in-out' booking.id %}" class="btn btn-success">
+                        <i class="fas fa-check-circle me-2"></i>Check-in Guest
+                    </a>
+                    {% elif booking.status == 'checked_in' and user.userrole.role == 'admin' or user.userrole.role == 'receptionist' %}
+                    <a href="{% url 'booking-check-in-out' booking.id %}" class="btn btn-info">
+                        <i class="fas fa-sign-out-alt me-2"></i>Check-out Guest
+                    </a>
+                    
+                    <a href="{% url 'booking-service-add' booking.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-concierge-bell me-2"></i>Add Service
+                    </a>
+                    {% endif %}
+                    
+                    {% if booking.status == 'checked_out' and user.userrole.role == 'admin' or user.userrole.role == 'receptionist' and not booking.bill.payment_status == 'paid' %}
+                    <a href="{% url 'generate-bill' booking.id %}" class="btn btn-warning">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>Process Payment
+                    </a>
+                    {% endif %}
+                    
+                    {% if booking.status == 'pending' %}
+                    <a href="{% url 'booking-cancel' booking.id %}" class="btn btn-danger">
+                        <i class="fas fa-times-circle me-2"></i>Cancel Booking
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Room Information -->
+        <div class="card">
+            <img src="{{ booking.room.image.url }}" class="card-img-top" alt="{{ booking.room.room_type.name }}">
+            <div class="card-body">
+                <h5 class="card-title">Room {{ booking.room.room_number }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ booking.room.room_type.name }}</h6>
+                <p class="card-text">{{ booking.room.description|truncatechars:150 }}</p>
+                <div class="mb-3">
+                    <span class="badge bg-secondary me-1"><i class="fas fa-users me-1"></i>{{ booking.room.capacity }} Guests</span>
+                    <span class="badge bg-secondary me-1"><i class="fas fa-bed me-1"></i>{{ booking.room.beds }} Beds</span>
+                    <span class="badge bg-secondary"><i class="fas fa-ruler-combined me-1"></i>{{ booking.room.size }} sqm</span>
+                </div>
+                <div class="mb-3">
+                    <p class="mb-1"><strong>Amenities:</strong></p>
+                    <p>{{ booking.room.amenities }}</p>
+                </div>
+                <a href="{% url 'room-detail' booking.room.id %}" class="btn btn-outline-primary">Room Details</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

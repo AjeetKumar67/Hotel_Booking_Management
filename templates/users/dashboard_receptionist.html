@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+
+{% block title %}Receptionist Dashboard | Hotel Management{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Receptionist Dashboard</h2>
+
+<div class="row">
+    <!-- Stats Cards -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="stat-label text-uppercase mb-1">Pending Bookings</div>
+                        <div class="stat-value">{{ pending_bookings }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="stat-label text-uppercase mb-1">Guests (Checked In)</div>
+                        <div class="stat-value">{{ checked_in_guests }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="stat-label text-uppercase mb-1">Today's Check-outs</div>
+                        <div class="stat-value">{{ today_checkouts }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="stat-label text-uppercase mb-1">Recent Activity</div>
+                        <div class="stat-value">{{ bookings.count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Bookings List -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Bookings</h5>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'booking-list' %}" class="btn btn-sm btn-outline-primary">All</a>
+                    <a href="{% url 'booking-list' %}?status=pending" class="btn btn-sm btn-outline-warning">Pending</a>
+                    <a href="{% url 'booking-list' %}?status=checked_in" class="btn btn-sm btn-outline-success">Checked In</a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if bookings %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Guest</th>
+                                <th>Room</th>
+                                <th>Check In</th>
+                                <th>Check Out</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in bookings %}
+                            <tr>
+                                <td>{{ booking.id }}</td>
+                                <td>{{ booking.user.username }}</td>
+                                <td>{{ booking.room.room_number }}</td>
+                                <td>{{ booking.check_in|date:"M d, Y" }}</td>
+                                <td>{{ booking.check_out|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if booking.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    {% elif booking.status == 'checked_in' %}
+                                    <span class="badge bg-success">Checked In</span>
+                                    {% elif booking.status == 'checked_out' %}
+                                    <span class="badge bg-info">Checked Out</span>
+                                    {% elif booking.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'booking-detail' booking.id %}" class="btn btn-sm btn-primary" title="View">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'check-in-out' booking.id %}" class="btn btn-sm btn-success" title="Check In/Out">
+                                            <i class="fas fa-clipboard-check"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center">No bookings found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-3">
+                    <a href="{% url 'room-list' %}" class="btn btn-primary">
+                        <i class="fas fa-bed me-2"></i>View Available Rooms
+                    </a>
+                    <a href="{% url 'booking-list' %}?status=pending" class="btn btn-warning">
+                        <i class="fas fa-clock me-2"></i>Pending Check-ins
+                    </a>
+                    <a href="{% url 'booking-list' %}?status=checked_in" class="btn btn-success">
+                        <i class="fas fa-user-check me-2"></i>Current Guests
+                    </a>
+                    <a href="{% url 'service-list' %}" class="btn btn-info">
+                        <i class="fas fa-concierge-bell me-2"></i>Services
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Today's Checkout Reminder</h5>
+            </div>
+            <div class="card-body">
+                {% if today_checkouts > 0 %}
+                <div class="alert alert-info text-center" role="alert">
+                    You have <strong>{{ today_checkouts }}</strong> guests checking out today.
+                    <br>
+                    <a href="{% url 'booking-list' %}" class="btn btn-sm btn-primary mt-2">View Details</a>
+                </div>
+                {% else %}
+                <div class="alert alert-success text-center" role="alert">
+                    No checkouts scheduled for today.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

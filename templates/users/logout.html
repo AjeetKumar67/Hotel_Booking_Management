@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Logged Out | Hotel Management{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Logged Out</h3>
+            </div>
+            <div class="card-body text-center">
+                <h5>You have successfully logged out.</h5>
+                <p>Thank you for using our Hotel Management System!</p>
+                <div class="mt-3">
+                    <a href="{% url 'login' %}" class="btn btn-primary">Log In Again</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

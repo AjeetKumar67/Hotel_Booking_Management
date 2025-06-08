@@ -1,0 +1,185 @@
+:root {
+    --hotel-primary: #1e3a8a;
+    --hotel-secondary: #2563eb;
+    --hotel-accent: #fbbf24;
+    --hotel-light: #f8fafc;
+    --hotel-dark: #0f172a;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Navbar styling */
+.navbar-brand {
+    font-weight: 700;
+    color: var(--hotel-accent) !important;
+}
+
+.navbar-dark {
+    background-color: var(--hotel-primary) !important;
+}
+
+.nav-link.active {
+    background-color: var(--hotel-secondary) !important;
+    border-radius: 5px;
+}
+
+/* Card styling */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    border: none;
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    background-color: var(--hotel-primary);
+    color: white;
+    border-radius: 8px 8px 0 0 !important;
+    padding: 12px 20px;
+}
+
+.card-title {
+    font-weight: 600;
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: var(--hotel-primary);
+    border-color: var(--hotel-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--hotel-secondary);
+    border-color: var(--hotel-secondary);
+}
+
+.btn-secondary {
+    background-color: var(--hotel-accent);
+    border-color: var(--hotel-accent);
+    color: var(--hotel-dark);
+}
+
+.btn-secondary:hover {
+    opacity: 0.9;
+    color: var(--hotel-dark);
+}
+
+/* Dashboard stats */
+.stat-card {
+    background-color: white;
+    border-left: 4px solid var(--hotel-accent);
+}
+
+.stat-card i {
+    font-size: 2rem;
+    color: var(--hotel-primary);
+}
+
+.stat-card .stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--hotel-primary);
+}
+
+.stat-card .stat-label {
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+/* Room cards */
+.room-card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.room-card .price {
+    font-size: 1.2rem;
+    color: var(--hotel-primary);
+    font-weight: 700;
+}
+
+.room-card .badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+/* Booking list */
+.booking-list .list-group-item {
+    margin-bottom: 10px;
+    border-left: 4px solid var(--hotel-secondary);
+}
+
+/* Feedback stars */
+.star-rating input[type="radio"] {
+    display: none;
+}
+
+.star-rating label {
+    color: #ddd;
+    font-size: 1.5rem;
+    padding: 0;
+    cursor: pointer;
+}
+
+.star-rating input[type="radio"]:checked ~ label {
+    color: #ffd700;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #ffcc00;
+}
+
+/* Footer */
+.footer {
+    margin-top: 3rem;
+    padding: 2rem 0;
+    background-color: var(--hotel-primary);
+    color: white;
+}
+
+/* Invoice styling */
+.invoice {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.invoice-header {
+    border-bottom: 2px solid var(--hotel-accent);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.invoice .invoice-details {
+    margin-bottom: 40px;
+}
+
+.invoice .table-invoice th {
+    background-color: var(--hotel-light);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .room-card img {
+        height: 150px;
+    }
+    
+    .stat-card .stat-value {
+        font-size: 1.4rem;
+    }
+}

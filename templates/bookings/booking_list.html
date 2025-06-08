@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Bookings | Hotel Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Bookings</h2>
+    <a href="{% url 'booking-create' %}" class="btn btn-primary">
+        <i class="fas fa-plus-circle me-2"></i>New Booking
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if bookings %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Room</th>
+                            <th>Guest</th>
+                            <th>Check-in</th>
+                            <th>Check-out</th>
+                            <th>Status</th>
+                            <th>Total Price</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td>{{ booking.id }}</td>
+                            <td>
+                                <a href="{% url 'room-detail' booking.room.id %}">
+                                    Room {{ booking.room.room_number }} - {{ booking.room.room_type.name }}
+                                </a>
+                            </td>
+                            <td>{{ booking.user.get_full_name|default:booking.user.username }}</td>
+                            <td>{{ booking.check_in|date:"M d, Y" }}</td>
+                            <td>{{ booking.check_out|date:"M d, Y" }}</td>
+                            <td>
+                                {% if booking.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% elif booking.status == 'checked_in' %}
+                                    <span class="badge bg-success">Checked In</span>
+                                {% elif booking.status == 'checked_out' %}
+                                    <span class="badge bg-info">Checked Out</span>
+                                {% elif booking.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td>${{ booking.total_price }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{% url 'booking-detail' booking.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    
+                                    {% if booking.status == 'pending' and user.userrole.role == 'admin' or user.userrole.role == 'receptionist' %}
+                                    <a href="{% url 'booking-check-in-out' booking.id %}" class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-check-circle"></i> Check-in
+                                    </a>
+                                    {% elif booking.status == 'checked_in' and user.userrole.role == 'admin' or user.userrole.role == 'receptionist' %}
+                                    <a href="{% url 'booking-check-in-out' booking.id %}" class="btn btn-sm btn-outline-info">
+                                        <i class="fas fa-sign-out-alt"></i> Check-out
+                                    </a>
+                                    {% endif %}
+                                    
+                                    {% if booking.status == 'pending' %}
+                                    <a href="{% url 'booking-cancel' booking.id %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-times-circle"></i> Cancel
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="far fa-calendar-times mb-3" style="font-size: 3rem; color: #ccc;"></i>
+                <h4>No bookings found</h4>
+                <p class="text-muted">There are no bookings in the system at this time.</p>
+                <a href="{% url 'booking-create' %}" class="btn btn-primary mt-3">
+                    <i class="fas fa-plus-circle me-2"></i>Create New Booking
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

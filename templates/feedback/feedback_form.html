@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Leave Feedback | Hotel Management{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Leave Your Feedback</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h5>Booking Details</h5>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Room:</strong> {{ booking.room.room_number }} - {{ booking.room.room_type.name }}</p>
+                                    <p><strong>Check In:</strong> {{ booking.check_in|date:"F j, Y" }}</p>
+                                    <p><strong>Check Out:</strong> {{ booking.check_out|date:"F j, Y" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Guests:</strong> {{ booking.guest_count }}</p>
+                                    <p><strong>Total:</strong> ${{ booking.total_price }}</p>
+                                    <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group mb-4">
+                                <label>Your Rating</label>
+                                <div class="rating-wrapper mt-2">
+                                    {{ form.rating|as_crispy_field }}
+                                </div>
+                            </div>
+                            
+                            <div class="form-group mb-4">
+                                <label>Your Comments</label>
+                                {{ form.comment|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> 
+                        Your feedback will be reviewed by our staff before being published.
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'booking-detail' booking.id %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Back to Booking
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i> Submit Feedback
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

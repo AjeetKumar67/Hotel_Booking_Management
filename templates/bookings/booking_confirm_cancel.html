@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancel Booking | Hotel Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Cancel Booking</h2>
+    <a href="{% url 'booking-detail' booking.id %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Booking
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">Warning: Booking Cancellation</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Are you sure you want to cancel this booking?</strong>
+                    <p class="mb-0 mt-2">This action cannot be undone. The room will be marked as available for new bookings.</p>
+                </div>
+                
+                <h5 class="mt-4">Booking Details</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Booking ID:</strong> #{{ booking.id }}</p>
+                        <p><strong>Guest:</strong> {{ booking.user.get_full_name|default:booking.user.username }}</p>
+                        <p><strong>Room:</strong> {{ booking.room.room_number }} - {{ booking.room.room_type.name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Check-in:</strong> {{ booking.check_in|date:"F d, Y" }}</p>
+                        <p><strong>Check-out:</strong> {{ booking.check_out|date:"F d, Y" }}</p>
+                        <p><strong>Total Price:</strong> ${{ booking.total_price }}</p>
+                    </div>
+                </div>
+                
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'booking-detail' booking.id %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>No, Go Back
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt me-2"></i>Yes, Cancel Booking
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Room Information -->
+        <div class="card">
+            <img src="{{ booking.room.image.url }}" class="card-img-top" alt="{{ booking.room.room_type.name }}">
+            <div class="card-body">
+                <h5 class="card-title">Room {{ booking.room.room_number }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ booking.room.room_type.name }}</h6>
+                <p class="card-text">{{ booking.room.description|truncatechars:150 }}</p>
+                <div class="mb-3">
+                    <span class="badge bg-secondary me-1"><i class="fas fa-users me-1"></i>{{ booking.room.capacity }} Guests</span>
+                    <span class="badge bg-secondary me-1"><i class="fas fa-bed me-1"></i>{{ booking.room.beds }} Beds</span>
+                    <span class="badge bg-secondary"><i class="fas fa-ruler-combined me-1"></i>{{ booking.room.size }} sqm</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

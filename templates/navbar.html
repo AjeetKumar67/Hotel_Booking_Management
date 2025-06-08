@@ -1,0 +1,87 @@
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'dashboard' %}">
+            <i class="fas fa-hotel me-2"></i>Luxury Hotel
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/rooms/' in request.path %}active{% endif %}" href="{% url 'room-list' %}">
+                            <i class="fas fa-bed me-1"></i> Rooms
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/bookings/' in request.path %}active{% endif %}" href="{% url 'booking-list' %}">
+                            <i class="fas fa-calendar-alt me-1"></i> Bookings
+                        </a>
+                    </li>
+                    
+                    {% if user.userrole.role == 'admin' or user.userrole.role == 'receptionist' %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if '/services/' in request.path %}active{% endif %}" href="{% url 'service-list' %}">
+                                <i class="fas fa-concierge-bell me-1"></i> Services
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/feedback/' in request.path %}active{% endif %}" href="{% url 'feedback-list' %}">
+                            <i class="fas fa-comment me-1"></i> Feedback
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/notifications/' in request.path %}active{% endif %}" href="{% url 'notification-list' %}">
+                            <i class="fas fa-bell me-1"></i> Notifications
+                        </a>
+                    </li>
+                    
+                    {% if user.userrole.role == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if '/staff/' in request.path %}active{% endif %}" href="{% url 'staff-list' %}">
+                                <i class="fas fa-users me-1"></i> Staff
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+            
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/login/' in request.path %}active{% endif %}" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt me-1"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if '/register/' in request.path %}active{% endif %}" href="{% url 'register' %}">
+                            <i class="fas fa-user-plus me-1"></i> Register
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

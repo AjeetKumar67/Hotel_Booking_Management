@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}{{ room.room_type.name }} - Room {{ room.room_number }} | Hotel Management{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'room-list' %}">Rooms</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Room {{ room.room_number }}</li>
+            </ol>
+        </nav>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="row g-0">
+            <div class="col-md-6">
+                <img src="{{ room.image.url }}" class="img-fluid rounded-start" alt="{{ room.room_type.name }}" style="height: 100%; object-fit: cover;">
+            </div>
+            <div class="col-md-6">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h2 class="card-title mb-3">{{ room.room_type.name }} - Room {{ room.room_number }}</h2>
+                        {% if room.status == 'available' %}
+                        <span class="badge bg-success">Available</span>
+                        {% elif room.status == 'booked' %}
+                        <span class="badge bg-danger">Booked</span>
+                        {% elif room.status == 'maintenance' %}
+                        <span class="badge bg-warning text-dark">Maintenance</span>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="card-text">{{ room.room_type.description }}</p>
+                    
+                    <h4 class="mt-4 mb-3">Details</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><i class="fas fa-users me-2"></i> <strong>Capacity:</strong> {{ room.room_type.capacity }} guests</li>
+                                <li class="list-group-item"><i class="fas fa-building me-2"></i> <strong>Floor:</strong> {{ room.floor }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item"><i class="fas fa-tag me-2"></i> <strong>Price:</strong> ${{ room.price }}/night</li>
+                                <li class="list-group-item"><i class="fas fa-clock me-2"></i> <strong>Last Updated:</strong> {{ room.updated_at|date:"M d, Y" }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h4 class="mt-4 mb-3">Amenities</h4>
+                    <div class="amenities-list">
+                        {% with amenities_list=room.room_type.amenities.split,"|" %}
+                            <div class="row">
+                                {% for amenity in amenities_list %}
+                                    <div class="col-md-6 mb-2">
+                                        <i class="fas fa-check-circle text-success me-2"></i> {{ amenity }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endwith %}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
+                        {% if room.status == 'available' and user.is_authenticated and user.userrole.role == 'guest' %}
+                        <a href="{% url 'booking-create' %}?room={{ room.id }}" class="btn btn-success btn-lg">
+                            <i class="fas fa-calendar-plus me-2"></i> Book Now
+                        </a>
+                        {% endif %}
+                        
+                        {% if user.is_authenticated and user.userrole.role in 'admin,receptionist' %}
+                        <a href="{% url 'room-update' room.id %}" class="btn btn-warning btn-lg">
+                            <i class="fas fa-edit me-2"></i> Edit Room
+                        </a>
+                        <a href="{% url 'room-delete' room.id %}" class="btn btn-danger btn-lg">
+                            <i class="fas fa-trash me-2"></i> Delete
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard | Hotel Management{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Admin Dashboard</h2>
+
+<div class="row">
+    <!-- Stats Cards -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="stat-label text-uppercase mb-1">Total Users</div>
+                        <div class="stat-value">{{ total_users }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="stat-label text-uppercase mb-1">Total Guests</div>
+                        <div class="stat-value">{{ total_guests }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="stat-label text-uppercase mb-1">Total Staff</div>
+                        <div class="stat-value">{{ total_staff }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="stat-label text-uppercase mb-1">Recent Bookings</div>
+                        <div class="stat-value">{{ recent_bookings.count }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Bookings -->
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Bookings</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_bookings %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Guest</th>
+                                <th>Room</th>
+                                <th>Check In</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for booking in recent_bookings %}
+                            <tr>
+                                <td>{{ booking.id }}</td>
+                                <td>{{ booking.user.username }}</td>
+                                <td>{{ booking.room.room_number }}</td>
+                                <td>{{ booking.check_in|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if booking.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    {% elif booking.status == 'checked_in' %}
+                                    <span class="badge bg-success">Checked In</span>
+                                    {% elif booking.status == 'checked_out' %}
+                                    <span class="badge bg-info">Checked Out</span>
+                                    {% elif booking.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'booking-detail' booking.id %}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-center">No recent bookings found.</p>
+                {% endif %}
+                <div class="text-center mt-3">
+                    <a href="{% url 'booking-list' %}" class="btn btn-outline-primary">View All Bookings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-3">
+                    <a href="{% url 'room-create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Room
+                    </a>
+                    <a href="{% url 'service-create' %}" class="btn btn-success">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Service
+                    </a>
+                    <a href="{% url 'notification-create' %}" class="btn btn-info">
+                        <i class="fas fa-bell me-2"></i>Create Notification
+                    </a>
+                    <a href="{% url 'staff-list' %}" class="btn btn-secondary">
+                        <i class="fas fa-user-cog me-2"></i>Manage Staff
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

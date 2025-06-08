@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Notification | Hotel Management{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-danger text-white">
+        <h3>Delete Notification</h3>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-warning">
+            <h4 class="alert-heading">Warning!</h4>
+            <p>Are you sure you want to delete the notification: <strong>"{{ notification.title }}"</strong>?</p>
+            <p>This action cannot be undone.</p>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Notification Details</h5>
+            </div>
+            <div class="card-body">
+                <h5>{{ notification.title }}</h5>
+                <p>{{ notification.content }}</p>
+                <small class="text-muted">
+                    Created on: {{ notification.created_at|date:"M d, Y H:i" }}<br>
+                    By: {{ notification.created_by.get_full_name|default:notification.created_by.username }}<br>
+                    For: 
+                    {% if notification.target_audience == 'staff' %}
+                        Staff Only
+                    {% elif notification.target_audience == 'guest' %}
+                        Guests Only
+                    {% else %}
+                        All Users
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'notification-list' %}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt me-2"></i>Delete Notification
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

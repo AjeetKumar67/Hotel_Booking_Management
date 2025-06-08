@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if booking.status == 'pending' %}Check-in Guest{% else %}Check-out Guest{% endif %} | Hotel Management
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>
+        {% if booking.status == 'pending' %}Check-in Guest{% else %}Check-out Guest{% endif %}
+    </h2>
+    <a href="{% url 'booking-detail' booking.id %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Booking
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Booking Information</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Booking ID:</strong> #{{ booking.id }}</p>
+                        <p><strong>Guest:</strong> {{ booking.user.get_full_name|default:booking.user.username }}</p>
+                        <p><strong>Room:</strong> {{ booking.room.room_number }} - {{ booking.room.room_type.name }}</p>
+                        <p><strong>Check-in:</strong> {{ booking.check_in|date:"F d, Y" }}</p>
+                        <p><strong>Check-out:</strong> {{ booking.check_out|date:"F d, Y" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Status:</strong> 
+                            {% if booking.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% elif booking.status == 'checked_in' %}
+                                <span class="badge bg-success">Checked In</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Adults:</strong> {{ booking.adults }}</p>
+                        <p><strong>Children:</strong> {{ booking.children }}</p>
+                        <p><strong>Total Price:</strong> ${{ booking.total_price }}</p>
+                        <p><strong>Booking Date:</strong> {{ booking.booking_date|date:"F d, Y H:i" }}</p>
+                    </div>
+                </div>
+                
+                {% if booking.special_requests %}
+                <div class="mt-3">
+                    <h5>Special Requests</h5>
+                    <p>{{ booking.special_requests }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    {% if booking.status == 'pending' %}Check-in Form{% else %}Check-out Form{% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <input type="hidden" name="{{ form.action.name }}" value="{% if booking.status == 'pending' %}check_in{% else %}check_out{% endif %}">
+                    
+                    {% if booking.status == 'pending' %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>You are about to check in the guest to Room {{ booking.room.room_number }}.
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>You are about to check out the guest from Room {{ booking.room.room_number }}.
+                        <p class="mt-2 mb-0">
+                            <strong>Note:</strong> This will automatically generate a bill for the guest.
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="{% url 'booking-detail' booking.id %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn {% if booking.status == 'pending' %}btn-success{% else %}btn-info{% endif %}">
+                            {% if booking.status == 'pending' %}
+                                <i class="fas fa-check-circle me-2"></i>Confirm Check-in
+                            {% else %}
+                                <i class="fas fa-sign-out-alt me-2"></i>Confirm Check-out
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
